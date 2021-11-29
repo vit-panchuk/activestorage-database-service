@@ -49,12 +49,10 @@ class ActiveStorage::DatabaseController < ActiveStorage::BaseController
   end
 
   def serve_file(key, service:, last_modified:, content_length:, content_type:, disposition:)
-    response.headers["Content-Type"] = content_type || DEFAULT_SEND_FILE_TYPE
-    response.headers["Content-Disposition"] = disposition || DEFAULT_SEND_FILE_DISPOSITION
     response.headers["Content-Length"] = content_length if !content_length.nil?
     response.headers["Last-Modified"] = last_modified if !last_modified.nil?
 
-    send_data service.download(key)
+    send_data(service.download(key), type: content_type || DEFAULT_SEND_FILE_TYPE, disposition: disposition || DEFAULT_SEND_FILE_DISPOSITION)
   end
 
 
