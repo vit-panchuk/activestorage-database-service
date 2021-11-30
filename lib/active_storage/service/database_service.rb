@@ -17,7 +17,9 @@ module ActiveStorage
       instrument :download, key: key do
         record = ::ActiveStorageDatum.find_by_key(key)
         if record
-          return record.io
+          io = record.io
+          yield io if block_given?
+          return io
         else
           raise ActiveStorage::FileNotFoundError
         end
@@ -27,6 +29,7 @@ module ActiveStorage
     def download_chunk(key, range)
       instrument :download_chunk, key: key, range: range do
         bytes = ::ActiveStorageDatum.select("substring(io from #{range.begin} for #{range.size})").find_by_key(key)
+        yield bytes if block_given?
         return bytes
       end
     end
